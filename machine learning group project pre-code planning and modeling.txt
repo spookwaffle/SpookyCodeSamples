@@ -1,0 +1,50 @@
+Hey so I've been going over the first half of the group project and I think I have a solution. Its not complete yet but its looking promising.
+
+Heres my approach:
+
+1. Gunther algorithm 1874 . By solving the NxN determinant you can find the exact solutions.
+
+If you set up a board(matrix) in the way he states you will get a symbolic determinant 
+
+i.e 2X2 Matrix M
+
+det(M)=
+
+[a1 c2]
+[b2 a3] 
+
+= a1*a3 - c2*b2
+
+The output states the placements of the queens by mathematical terms (groupings separated by addition or subtraction)
+
+Term 1
+
+a1, a2
+
+Term  2
+
+c2, b2
+
+He states in his algorithm that if a term has the same letter or same number twice then it is not a solution. 
+
+So for the two terms I gave there isnt a solution because 
+
+Term 1 has 2 'a's 
+
+Term 2 has  2 '2's 
+
+
+
+
+To save coding time I found a free linear algebra library thats pretty popular called Symbolicc++  and stackexchange, github, and other forums have examples on how to use it and install it.
+On the Symbolicc++ website they have a suggested book and I've found portions of it in pdf that help as well but Im not buying the entire book.
+
+One of the examples on github using Symbolicc++ finds determinants of varying sizes including a 20X20 matrix in a reasonable amount of time. 
+
+Symbolicc++ is good for doing mathematics on symbols(derivatives of variables, matrixes with symbolic values , etc) . It can also use numbers but for our case I think all we need is the symbols. 
+
+The code will just be building the  necessary matrix , find its determinant, parsing the string output, finding the solution.
+
+Right now I have two of the 4 steps done to an extent. The hard part I think will be building the correct matrix because its a funky matrix pattern but it makes sense when you see it. 
+
+If anyone would like to do the backtracking algorithms discussed in class we can do that as well. I chose this approach because I understood the algorithm a lot better than the backtracking loops which confuse me .

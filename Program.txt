@@ -1,0 +1,104 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.IO;
+using System.Runtime.CompilerServices;
+using System.Security;
+using System.Diagnostics;
+using System.Threading.Tasks;
+
+namespace Queue
+{
+    class Program
+    {
+        private static Queue<string> sharedQueue = new Queue<string>(); //FIFO Queue casted for string input
+        const int buffersize = 5;
+        TimeSpan timeout = new TimeSpan(0, 0, 3);
+        public static void Main()
+        {
+            Thread t1 = new Thread(Producer); //Producer process
+            Thread t2 = new Thread(Consumer); //Consumer Process
+            t1.Start();
+            t2.Start();
+            
+            // Join them:
+            t1.Join();
+            t2.Join();
+           
+        }
+        private static void Producer()
+        {
+            
+            StreamReader file = new StreamReader("Read.txt");
+            string word = "paul";
+           
+
+            while (true)
+            {
+                lock (sharedQueue)
+                {
+                    while (sharedQueue.Count == buffersize)
+                    {
+                        Console.WriteLine("full");
+                        Monitor.Wait(sharedQueue, TimeSpan.FromSeconds(8.00));
+                    }
+                    
+                    
+                        word = file.ReadLine(); //produce a word
+                        Console.WriteLine("Putting words in queue");
+                        sharedQueue.Enqueue(word); //place word in shared buffer
+                    
+                        Console.WriteLine(sharedQueue.Count());
+
+                        Monitor.Pulse(sharedQueue); // pulse or increment the buffer
+                    
+                }
+                
+            }
+           
+            
+
+
+           
+        }
+        private static void Consumer()
+        {
+            
+            
+
+            StreamWriter outfile = new StreamWriter("Output.txt");
+            string word = null;
+
+            while (true)
+            {
+                
+                
+                lock (sharedQueue)
+                {
+                    
+
+                    while (sharedQueue.Count == 0)
+                    {
+                        Console.WriteLine("Nothing in queue right now. ", sharedQueue.Count());
+                        Monitor.Wait(sharedQueue, TimeSpan.FromSeconds(3.00)); //wait for producer thread to produce something
+                        
+                        
+                    }
+                    Console.WriteLine("Taking words out of queue");
+                    word = sharedQueue.Dequeue(); // Take word out of queue
+
+                    Monitor.Pulse(sharedQueue); //shift queue
+
+
+                }
+                outfile.WriteLine(word); //write word to output.txt file 
+                
+            }
+            
+
+
+        }
+    }
+}
