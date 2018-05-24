@@ -1,0 +1,153 @@
+*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package javaapplication1;
+
+
+import java.util.Scanner;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
+import org.json.simple.parser.JSONParser;
+
+
+/**
+ *
+ * @author sccla1
+ */
+public class JavaApplication1 
+{
+
+    /**
+     * @param args the command line arguments
+     * @throws java.net.ProtocolException
+     * @throws java.net.MalformedURLException
+     */
+    
+        
+ 
+        
+        
+        
+    
+        
+
+    public static void main(String[] args) throws IOException 
+    {
+        List<String> mylinks = new ArrayList<String>();
+        mylinks.add("&origin=W+Baltimore+Street+%26+Hopkins+Plaza,+Baltimore,+MD&destination=W+Baltimore+Street+%26+N+Hanover+St,+Baltimore,+MD");
+        mylinks.add("&origin=W+Baltimore+Street+%26+N+Hanover+Street,+Baltimore,+MD&destination=W+Baltimore+Street+%26+N+Charles+Street,+Baltimore,+MD");
+        mylinks.add("&origin=W+Baltimore+Street+%26+N+Charles+Street,+Baltimore,+MD&destination=E+Batltimore+Street+%26+St+Paul+Street,+Baltimore,+MD");
+        mylinks.add("&origin=W+Baltimore+Street+%26+Hopkins+Plaza,+Baltimore,+MD&destination=E+Batltimore+Street+%26+St+Pault+Street,+Baltimore,+MD");
+        
+        
+        
+        Scanner scanner = new Scanner( System.in );
+        System.out.println("Enter Link # ");
+        int link_selection = scanner.nextInt();
+        /*
+        System.out.print( "Type your origin: " );
+        String origin = scanner.nextLine();
+        System.out.print( "Type your destination: " );
+        String destination = scanner.nextLine();
+        */
+        URL url = null;
+        /*Type your origin: W+Baltimore+Street+%26+Hopkins+Plaza,+Baltimore,+MD
+          Type your destination: W+Baltimore+Street+%26+N+Hanover+St,+Baltimore,+MD
+        */
+        try {
+            url = new URL("https://maps.googleapis.com/maps/api/directions/json?units=imperial"+ mylinks.get(link_selection - 1) + "&travelMode=driving&departure_time=now&key=AIzaSyDXPwj5n4kMCZR3ynSgvaRr3SZD9jJ-DQE");
+            
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(JavaApplication1.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        HttpURLConnection con = null;
+        try {
+            con = (HttpURLConnection) url.openConnection();
+        } catch (IOException ex) {
+            Logger.getLogger(JavaApplication1.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
+            con.setRequestMethod("GET");
+        } catch (ProtocolException ex) {
+            Logger.getLogger(JavaApplication1.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        try {
+            int status = con.getResponseCode();
+        } catch (IOException ex) {
+            Logger.getLogger(JavaApplication1.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+       
+           JsonReader rdr = Json.createReader((con.getInputStream()));
+          
+        
+           
+     /*
+        String inputLine;
+        StringBuffer content = new StringBuffer();
+        try {
+            while ((inputLine = in.readLine()) != null) 
+            {
+                content.append(inputLine);
+                
+                
+                
+            }
+         
+            String myoutput = content.toString(); 
+           */
+           
+            
+            JSONParser parser = new JSONParser(); 
+           
+            JsonObject obj= rdr.readObject();
+            JsonArray routes = obj.getJsonArray("routes");
+            JsonObject obj2 = routes.getJsonObject(0);
+            JsonArray legs = obj2.getJsonArray("legs");
+            JsonObject obj3 = legs.getJsonObject(0);
+            JsonObject durationintraffic = obj3.getJsonObject("duration_in_traffic");
+            JsonObject durationwithouttraffic = obj3.getJsonObject("duration");
+            /*JsonArray rows = obj.getJsonArray("rows");
+            JsonObject obj2 = rows.getJsonObject(0);
+            JsonArray elements = obj2.getJsonArray("elements");
+            JsonObject s1 = elements.getJsonObject(0);
+            JsonObject distance = s1.getJsonObject("distance");
+            JsonObject duration = s1.getJsonObject("duration");
+            
+            
+           
+            System.out.print(duration.getJsonString("text"));
+            */
+            System.out.println(obj.toString());
+            System.out.println("duration in traffic: " + durationintraffic.getInt("value") + " seconds");
+            System.out.println("duration without traffic: " + durationwithouttraffic.getInt("value")+" seconds");
+           /*
+            JsonString myobjectinfo = obj.getJsonObject("distance").getJsonString("text");
+           
+            System.out.print(myobjectinfo);
+            */
+            con.disconnect();
+            rdr.close();
+            
+            
+        
+        
+        // TODO code application logic here
+    }
+    
+}
